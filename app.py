@@ -1,21 +1,13 @@
 import streamlit as st
 
-from apputil import *
+import numpy as np
+from apputil import kmeans 
 
+X = np.array([[1, 2], [2, 3], [10, 11]])
 
-st.write(
-'''
-# Week x: [Title]
+centroids, labels = kmeans(X, k=2)
 
-...
-''')
-
-# currently set for integer input
-amount = st.number_input("Exercise Input: ", 
-                         value=None, 
-                         step=1, 
-                         format="%d")
-
-if amount is not None:
-    st.write(f"The exercise input was {amount}.")
-
+print("centroids:")
+print(centroids)
+print("\nlabels:")
+print(labels)
