@@ -2,6 +2,10 @@
 import numpy as np
 from sklearn.cluster import KMeans
 from typing import Tuple
+import seaborn as sns
+import pandas as pd
+
+DIAMONDS_NUMERIC: pd.DataFrame | None = None
 
 def kmeans(X, k: int) -> Tuple[np.ndarray, np.ndarray]:
     # check input validity
@@ -20,4 +24,47 @@ def kmeans(X, k: int) -> Tuple[np.ndarray, np.ndarray]:
 
     labels = km.fit_predict(X)
     centroids = km.cluster_centers_
+    return centroids, labels
+
+def _load_diamonds_numeric() -> None:
+    """load the numeric columns of the seaborn diamonds dataset into DIAMONDS_NUMERIC"""
+    global DIAMONDS_NUMERIC
+    df = sns.load_dataset("diamonds")
+    cols = ["carat", "depth", "table", "price", "x", "y", "z"]
+    # check columns exist
+    missing = [c for c in cols if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"diamonds less: {missing}")
+    DIAMONDS_NUMERIC = df[cols].copy()
+
+# Load diamonds numeric data at module load time
+if DIAMONDS_NUMERIC is None:
+    _load_diamonds_numeric()
+
+def kmeans_diamonds(n: int, k: int):
+    """
+    perform k-means clustering on the first n rows of the numeric columns of the seaborn diamonds dataset.
+    ----
+    n : int
+        number of rows to use (1 <= n <= total number of rows in the dataset).
+    k : int
+        number of clusters.
+
+    returns
+    ----
+    (centroids, labels)
+      centroids: np.ndarray, shape=(k, 7)
+      labels   : np.ndarray, shape=(n,)
+    """
+    if DIAMONDS_NUMERIC is None:
+        _load_diamonds_numeric()
+
+    total = len(DIAMONDS_NUMERIC)
+    if not isinstance(n, (int, np.integer)) or n <= 0 or n > total:
+        raise ValueError(f"n between 1 and {total} is required")
+    # float dtype
+    X = DIAMONDS_NUMERIC.head(int(n)).to_numpy(dtype=float)
+
+    # call kmeans
+    centroids, labels = kmeans(X, k)
     return centroids, labels
