@@ -74,17 +74,13 @@ def kmeans_diamonds(n: int, k: int):
 
 # ex3
 def kmeans_timer(n: int, k: int, n_iter: int = 5) -> float:
-    """
-    連續執行 kmeans_diamonds(n, k) 恰好 n_iter 次，量測每次耗時（秒），
-    並回傳平均耗時（秒）。
-    """
-    # 基本參數檢查
+    # check input validity
     if not isinstance(n_iter, (int, np.integer)) or n_iter <= 0:
-        raise ValueError("n_iter 必須是正整數")
+        raise ValueError("n_iter should be a positive integer")
 
-    # 確保 diamonds 數值版已載入（避免把載入時間算在第一次迭代內）
+    # check DIAMONDS_NUMERIC loaded
     try:
-        _ = DIAMONDS_NUMERIC  # 若在同檔案可直接引用全域
+        _ = DIAMONDS_NUMERIC  # if not defined, load it
     except NameError:
         pass
     if 'DIAMONDS_NUMERIC' in globals() and DIAMONDS_NUMERIC is None:
@@ -93,7 +89,7 @@ def kmeans_timer(n: int, k: int, n_iter: int = 5) -> float:
     times = []
     for _ in range(int(n_iter)):
         t0 = perf_counter()
-        _ = kmeans_diamonds(n, k)   # 呼叫第二題的函式
+        _ = kmeans_diamonds(n, k)   # call the function from ex2
         times.append(perf_counter() - t0)
 
     return float(np.mean(times))
